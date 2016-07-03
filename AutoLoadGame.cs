@@ -34,19 +34,19 @@ namespace AutoLoadGame
 				}
 				else 
 				{
-					Utils.LogF("LoadTestGame: Configuration file is empty: {}", config);
+					Utils.Log("LoadTestGame: Configuration file is empty: {}", config);
 					return;
 				}
 			}
 			else 
 			{
-				Utils.LogF("LoadTestGame: Configuration file not found: {}", config);
+				Utils.Log("LoadTestGame: Configuration file not found: {}", config);
 				return;
 			}
 			var savefile = Utils.PathChain(savesdir, game, save+".sfs");
 			if(!File.Exists(savefile)) 
 			{
-				Utils.LogF("No such file: {}", savefile);
+				Utils.Log("No such file: {}", savefile);
 				return;
 			}
 			HighLogic.CurrentGame = GamePersistence.LoadGame(save, game, false, false);
