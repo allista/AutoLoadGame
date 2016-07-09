@@ -2,3 +2,5 @@
 *.mdb
 *.dll
 obj/**
+/AutoLoadGame.zip
+/Images/AutoLoadGame.png
