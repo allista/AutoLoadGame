@@ -15,11 +15,16 @@ namespace AutoLoadGame
 	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
 	public class AutoLoadGame : MonoBehaviour
 	{
+		static bool Loaded;
 		static readonly string savesdir = KSPUtil.ApplicationRootPath+"saves";
 		static readonly string config   = Path.Combine(savesdir, "AutoLoadGame.conf");
 
 		void Awake()
 		{
+			//load the game only the first time (i.e. at game start)
+			if(Loaded) return;
+			Loaded = true;
+			//get the game and the save
 			var game = "";
 			var save = "";
 			if(File.Exists(config))
@@ -49,6 +54,7 @@ namespace AutoLoadGame
 				Utils.Log("No such file: {}", savefile);
 				return;
 			}
+			//load the game
 			HighLogic.CurrentGame = GamePersistence.LoadGame(save, game, false, false);
 			if (HighLogic.CurrentGame != null)
 			{
