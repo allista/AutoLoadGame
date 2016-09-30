@@ -1,6 +1,6 @@
 ﻿*~
 *.mdb
 *.dll
-obj/**
-/AutoLoadGame.zip
+obj
+Releases
 /Images/AutoLoadGame.png
