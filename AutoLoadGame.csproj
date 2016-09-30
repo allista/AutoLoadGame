@@ -59,13 +59,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\AT_Utils\AT_Utils.csproj">
-      <Project>{64CC36A2-0610-4F74-9F31-3D4E22866B7E}</Project>
-      <Name>AT_Utils</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,4 @@
-﻿//   MyClass.cs
-//
-//  Author:
+﻿//  Author:
 //       Allis Tauri <allista@gmail.com>
 //
 //  Copyright (c) 2016 Allis Tauri
@@ -8,7 +6,6 @@
 using System;
 using System.IO;
 using UnityEngine;
-using AT_Utils;
 
 namespace AutoLoadGame
 {
@@ -16,8 +13,10 @@ namespace AutoLoadGame
 	public class AutoLoadGame : MonoBehaviour
 	{
 		static bool Loaded;
-		static readonly string savesdir = KSPUtil.ApplicationRootPath+"saves";
+		static readonly string savesdir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
 		static readonly string config   = Path.Combine(savesdir, "AutoLoadGame.conf");
+
+		static void Log(string msg, params object[] args) { Debug.Log(string.Format(msg, args)); }
 
 		void Awake()
 		{
@@ -39,19 +38,25 @@ namespace AutoLoadGame
 				}
 				else 
 				{
-					Utils.Log("LoadTestGame: Configuration file is empty: {}", config);
+					Log("LoadTestGame: Configuration file is empty: {0}", config);
 					return;
 				}
 			}
 			else 
 			{
-				Utils.Log("LoadTestGame: Configuration file not found: {}", config);
+				Log("LoadTestGame: Configuration file not found: {0}", config);
 				return;
 			}
-			var savefile = Utils.PathChain(savesdir, game, save+".sfs");
+			var gamedir = Path.Combine(savesdir, game);
+			if(!Directory.Exists(gamedir))
+			{
+				Log("No game directory: {0}", gamedir);
+				return;
+			}
+			var savefile = Path.Combine(gamedir, save+".sfs");
 			if(!File.Exists(savefile)) 
 			{
-				Utils.Log("No such file: {}", savefile);
+				Log("No such file: {0}", savefile);
 				return;
 			}
 			//load the game
