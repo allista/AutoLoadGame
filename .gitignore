@@ -1,6 +1,7 @@
 ﻿*~
 *.mdb
 *.dll
+*.userprefs
 obj
 Releases
 /Images/AutoLoadGame.png
