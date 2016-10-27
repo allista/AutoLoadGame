@@ -18,7 +18,7 @@ namespace AutoLoadGame
 
 		static void Log(string msg, params object[] args) { Debug.Log(string.Format(msg, args)); }
 
-		void Awake()
+		void LoadGame()
 		{
 			//load the game only the first time (i.e. at game start)
 			if(Loaded) return;
@@ -68,6 +68,12 @@ namespace AutoLoadGame
 				HighLogic.CurrentGame.Start();
 			}
 		}
+
+		void onLevelWasLoaded(GameScenes scene)
+		{ if(scene == GameScenes.MAINMENU) LoadGame(); }
+
+		void Awake()
+		{ GameEvents.onLevelWasLoaded.Add(onLevelWasLoaded); }
 	}
 }
 
