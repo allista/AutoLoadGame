@@ -1,11 +1,12 @@
 {
     "NAME":"AutoLoadGame",
-	"URL":"https://raw.githubusercontent.com/allista/AutoLoadGame/master/AutoLoadGame_KSP-AVC",
+    "URL":"https://raw.githubusercontent.com/allista/AutoLoadGame/master/GameData/AutoLoadGame.version",
+    "DOWNLOAD":"http://spacedock.info/mod/832/AutoLoadGame",
     "VERSION":
     {
         "MAJOR":1,
         "MINOR":0,
-        "PATCH":3,
+        "PATCH":4,
         "BUILD":0
     },
     "KSP_VERSION":
