@@ -86,7 +86,10 @@ namespace AutoLoadGame
 					GamePersistence.SaveGame(HighLogic.CurrentGame, save, game, SaveMode.OVERWRITE);
 				}
 				if(HighLogic.CurrentGame.startScene == GameScenes.FLIGHT)
+				{
 					AutoSwitchVessel.activeVessel = HighLogic.CurrentGame.flightState.activeVesselIdx;
+					AutoSwitchVessel.save = save;
+				}
 				HighLogic.CurrentGame.startScene = GameScenes.SPACECENTER;
 				HighLogic.SaveFolder = game;
 				HighLogic.CurrentGame.Start();
@@ -103,12 +106,12 @@ namespace AutoLoadGame
 	[KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
 	public class AutoSwitchVessel : MonoBehaviour
 	{
+		public static string save = "persistent";
 		public static int activeVessel = -1;
 
 		static void switch_to_active_vessel()
 		{
-			GamePersistence.SaveGame("persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
-			FlightDriver.StartAndFocusVessel("persistent", activeVessel);
+			FlightDriver.StartAndFocusVessel(save, activeVessel);
 			activeVessel = -1;
 		}
 
