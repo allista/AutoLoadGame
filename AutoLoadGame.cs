@@ -7,6 +7,8 @@ using System;
 using System.IO;
 using UnityEngine;
 
+using SaveUpgradePipeline;
+
 namespace AutoLoadGame
 {
 	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
@@ -16,7 +18,11 @@ namespace AutoLoadGame
 		static readonly string savesdir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
 		static readonly string config   = Path.Combine(savesdir, "AutoLoadGame.conf");
 
-		static void Log(string msg, params object[] args) { Debug.Log(string.Format(msg, args)); }
+		public static void Log(string msg, params object[] args) 
+		{ Debug.Log(string.Format("[AutoLoadGame]: "+msg, args)); }
+
+		string game = "";
+		string save = "";
 
 		void LoadGame()
 		{
@@ -24,8 +30,6 @@ namespace AutoLoadGame
 			if(Loaded) return;
 			Loaded = true;
 			//get the game and the save
-			var game = "";
-			var save = "";
 			if(File.Exists(config))
 			{
 				var cfg = ConfigNode.Load(config);
@@ -38,13 +42,13 @@ namespace AutoLoadGame
 				}
 				else 
 				{
-					Log("LoadTestGame: Configuration file is empty: {0}", config);
+					Log("Configuration file is empty: {0}", config);
 					return;
 				}
 			}
 			else 
 			{
-				Log("LoadTestGame: Configuration file not found: {0}", config);
+				Log("Configuration file not found: {0}", config);
 				return;
 			}
 			var gamedir = Path.Combine(savesdir, game);
@@ -60,20 +64,67 @@ namespace AutoLoadGame
 				return;
 			}
 			//load the game
-			HighLogic.CurrentGame = GamePersistence.LoadGame(save, game, false, false);
-			if (HighLogic.CurrentGame != null)
+			var game_node = GamePersistence.LoadSFSFile(save, game);
+			if(game_node == null)
 			{
-				GamePersistence.UpdateScenarioModules(HighLogic.CurrentGame);
+				Log("Unable to load the save: {0}", savefile);
+				return;
+			}
+			Log("Loading: {0}/{1}", game, save);
+			KSPUpgradePipeline.Process(game_node, game, LoadContext.SFS, OnLoadDialogPipelineFinished, 
+			                           (opt, n) => Log("KSPUpgradePipeline finished with error: {0}", savefile));
+		}
+
+		void OnLoadDialogPipelineFinished(ConfigNode node)
+		{
+			HighLogic.CurrentGame = GamePersistence.LoadGameCfg(node, game, true, false);
+			if(HighLogic.CurrentGame != null)
+			{
+				if(GamePersistence.UpdateScenarioModules(HighLogic.CurrentGame))
+				{
+					if(node != null) GameEvents.onGameStatePostLoad.Fire(node);
+					GamePersistence.SaveGame(HighLogic.CurrentGame, save, game, SaveMode.OVERWRITE);
+				}
+				if(HighLogic.CurrentGame.startScene == GameScenes.FLIGHT)
+					AutoSwitchVessel.activeVessel = HighLogic.CurrentGame.flightState.activeVesselIdx;
+				HighLogic.CurrentGame.startScene = GameScenes.SPACECENTER;
 				HighLogic.SaveFolder = game;
 				HighLogic.CurrentGame.Start();
 			}
 		}
 
-		void onLevelWasLoaded(GameScenes scene)
+		void onLevelWasLoaded(GameScenes scene) 
 		{ if(scene == GameScenes.MAINMENU) LoadGame(); }
 
 		void Awake()
-		{ GameEvents.onLevelWasLoaded.Add(onLevelWasLoaded); }
+		{ GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded); }
+	}
+
+	[KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+	public class AutoSwitchVessel : MonoBehaviour
+	{
+		public static int activeVessel = -1;
+
+		static void switch_to_active_vessel()
+		{
+			GamePersistence.SaveGame("persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
+			FlightDriver.StartAndFocusVessel("persistent", activeVessel);
+			activeVessel = -1;
+		}
+
+		void onLevelWasLoaded(GameScenes scene)
+		{ 
+			if(scene == GameScenes.SPACECENTER && activeVessel >= 0)
+			{
+				AutoLoadGame.Log("SPACECENTER is loaded. Waiting 60 frames and switching to the active vessel.");
+				StartCoroutine(CallbackUtil.DelayedCallback(60, switch_to_active_vessel)); 
+			}
+		}
+
+		void Awake()
+		{ 
+			GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded); 
+		}
 	}
 }
 
