@@ -100,7 +100,7 @@ namespace AutoLoadGame
         { 
             if(scene == GameScenes.MAINMENU) 
             {
-                AutoLoadGame.Log("MAINMENU is loaded. Waiting 60 frames and loading the save.");
+                Log("MAINMENU is loaded. Waiting 60 frames and loading the save.");
                 StartCoroutine(CallbackUtil.DelayedCallback(60, LoadGame));
             }
         }
