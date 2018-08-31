@@ -5,3 +5,5 @@
 obj
 Releases
 /Images/AutoLoadGame.png
+
+*.pdb
