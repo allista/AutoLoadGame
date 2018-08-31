@@ -15,6 +15,7 @@ namespace AutoLoadGame
     public class AutoLoadGame : MonoBehaviour
     {
         static bool Loaded;
+		static AutoLoadGame instance;
         static readonly string savesdir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
         static readonly string config   = Path.Combine(savesdir, "AutoLoadGame.conf");
 
@@ -107,7 +108,14 @@ namespace AutoLoadGame
 
         void Awake()
         { 
-            GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded); 
+			if(instance != null)
+			{
+				Destroy(this);
+                return;
+			}
+            GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded);
+			DontDestroyOnLoad(this);
+			instance = this;
         }
     }
 
