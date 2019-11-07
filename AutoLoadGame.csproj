@@ -50,6 +50,9 @@
       <HintPath>..\KSP-test\KSP_test_1.8.1\KSP_Data\Managed\System.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\KSP-test\KSP_test_1.8.1\KSP_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
