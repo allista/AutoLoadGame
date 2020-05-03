@@ -3,10 +3,8 @@
 //
 //  Copyright (c) 2016 Allis Tauri
 
-using System;
 using System.IO;
 using UnityEngine;
-
 using SaveUpgradePipeline;
 
 namespace AutoLoadGame
@@ -14,22 +12,23 @@ namespace AutoLoadGame
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class AutoLoadGame : MonoBehaviour
     {
-        static bool Loaded;
-		static AutoLoadGame instance;
-        static readonly string savesdir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
-        static readonly string config   = Path.Combine(savesdir, "AutoLoadGame.conf");
+        private static bool loaded;
+        private static AutoLoadGame instance;
+        private static string savesDir;
+        private static string config;
 
-        public static void Log(string msg, params object[] args) 
-        { Debug.Log(string.Format("[AutoLoadGame]: "+msg, args)); }
+        public static void Log(string msg, params object[] args) =>
+            Debug.Log(string.Format("[AutoLoadGame]: " + msg, args));
 
-        string game = "";
-        string save = "";
+        private string game = "";
+        private string save = "";
 
-        void LoadGame()
+        private void LoadGame()
         {
             //load the game only the first time (i.e. at game start)
-            if(Loaded) return;
-            Loaded = true;
+            if(loaded)
+                return;
+            loaded = true;
             //get the game and the save
             if(File.Exists(config))
             {
@@ -37,43 +36,48 @@ namespace AutoLoadGame
                 if(cfg != null)
                 {
                     var val = cfg.GetValue("game");
-                    if(val != null) game = val;
+                    if(val != null)
+                        game = val;
                     val = cfg.GetValue("save");
-                    if(val != null) save = val;
+                    if(val != null)
+                        save = val;
                 }
-                else 
+                else
                 {
                     Log("Configuration file is empty: {0}", config);
                     return;
                 }
             }
-            else 
+            else
             {
                 Log("Configuration file not found: {0}", config);
                 return;
             }
-            var gamedir = Path.Combine(savesdir, game);
-            if(!Directory.Exists(gamedir))
+            var gameDir = Path.Combine(savesDir, game);
+            if(!Directory.Exists(gameDir))
             {
-                Log("No game directory: {0}", gamedir);
+                Log("No game directory: {0}", gameDir);
                 return;
             }
-            var savefile = Path.Combine(gamedir, save+".sfs");
-            if(!File.Exists(savefile)) 
+            var saveFile = Path.Combine(gameDir, save + ".sfs");
+            if(!File.Exists(saveFile))
             {
-                Log("No such file: {0}", savefile);
+                Log("No such file: {0}", saveFile);
                 return;
             }
             //load the game
             var game_node = GamePersistence.LoadSFSFile(save, game);
             if(game_node == null)
             {
-                Log("Unable to load the save: {0}", savefile);
+                Log("Unable to load the save: {0}", saveFile);
                 return;
             }
             Log("Loading: {0}/{1}", game, save);
-            KSPUpgradePipeline.Process(game_node, game, LoadContext.SFS, OnLoadDialogPipelineFinished, 
-                                       (opt, n) => Log("KSPUpgradePipeline finished with error: {0}", savefile));
+            KSPUpgradePipeline.Process(game_node,
+                game,
+                LoadContext.SFS,
+                OnLoadDialogPipelineFinished,
+                (opt, n) => Log("KSPUpgradePipeline finished with error: {0}", saveFile));
         }
 
         void OnLoadDialogPipelineFinished(ConfigNode node)
@@ -83,7 +87,8 @@ namespace AutoLoadGame
             {
                 if(GamePersistence.UpdateScenarioModules(HighLogic.CurrentGame))
                 {
-                    if(node != null) GameEvents.onGameStatePostLoad.Fire(node);
+                    if(node != null)
+                        GameEvents.onGameStatePostLoad.Fire(node);
                     GamePersistence.SaveGame(HighLogic.CurrentGame, save, game, SaveMode.OVERWRITE);
                 }
                 if(HighLogic.CurrentGame.startScene == GameScenes.FLIGHT)
@@ -97,25 +102,26 @@ namespace AutoLoadGame
             }
         }
 
-        void onLevelWasLoaded(GameScenes scene) 
-        { 
-            if(scene == GameScenes.MAINMENU) 
-            {
-                Log("MAINMENU is loaded. Waiting 60 frames and loading the save.");
-                StartCoroutine(CallbackUtil.DelayedCallback(60, LoadGame));
-            }
+        private void onLevelWasLoaded(GameScenes scene)
+        {
+            if(scene != GameScenes.MAINMENU)
+                return;
+            Log("MAINMENU is loaded. Waiting 60 frames and loading the save.");
+            StartCoroutine(CallbackUtil.DelayedCallback(60, LoadGame));
         }
 
-        void Awake()
-        { 
-			if(instance != null)
-			{
-				Destroy(this);
+        private void Awake()
+        {
+            if(instance != null)
+            {
+                Destroy(this);
                 return;
-			}
+            }
             GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded);
-			DontDestroyOnLoad(this);
-			instance = this;
+            DontDestroyOnLoad(this);
+            instance = this;
+            savesDir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
+            config = Path.Combine(savesDir, "AutoLoadGame.conf");
         }
     }
 
@@ -125,25 +131,23 @@ namespace AutoLoadGame
         public static string save = "persistent";
         public static int activeVessel = -1;
 
-        static void switch_to_active_vessel()
+        private static void switch_to_active_vessel()
         {
             FlightDriver.StartAndFocusVessel(save, activeVessel);
             activeVessel = -1;
         }
 
-        void onLevelWasLoaded(GameScenes scene)
-        { 
-            if(scene == GameScenes.SPACECENTER && activeVessel >= 0)
-            {
-                AutoLoadGame.Log("SPACECENTER is loaded. Waiting 60 frames and switching to the active vessel.");
-                StartCoroutine(CallbackUtil.DelayedCallback(60, switch_to_active_vessel));
-            }
+        private void onLevelWasLoaded(GameScenes scene)
+        {
+            if(scene != GameScenes.SPACECENTER || activeVessel < 0)
+                return;
+            AutoLoadGame.Log("SPACECENTER is loaded. Waiting 60 frames and switching to the active vessel.");
+            StartCoroutine(CallbackUtil.DelayedCallback(60, switch_to_active_vessel));
         }
 
-        void Awake()
-        { 
-            GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded); 
+        private void Awake()
+        {
+            GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded);
         }
     }
 }
-
