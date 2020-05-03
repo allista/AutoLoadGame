@@ -16,8 +16,8 @@ namespace AutoLoadGame
     {
         static bool Loaded;
 		static AutoLoadGame instance;
-        static readonly string savesdir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
-        static readonly string config   = Path.Combine(savesdir, "AutoLoadGame.conf");
+        private static string savesdir;
+        private static string config;
 
         public static void Log(string msg, params object[] args) 
         { Debug.Log(string.Format("[AutoLoadGame]: "+msg, args)); }
@@ -116,6 +116,8 @@ namespace AutoLoadGame
             GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoaded);
 			DontDestroyOnLoad(this);
 			instance = this;
+            savesDir = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
+            config = Path.Combine(savesDir, "AutoLoadGame.conf");
         }
     }
 
