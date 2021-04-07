@@ -40,8 +40,8 @@ namespace AutoLoadGame
     {
         public ModInfo()
         {
-            MinKSPVersion = new Version(1, 8, 0);
-            MaxKSPVersion = new Version(1, 9, 1);
+            MinKSPVersion = new Version(1, 11, 1);
+            MaxKSPVersion = new Version(1, 11, 1);
 
             VersionURL =
                 "https://github.com/allista/AutoLoadGame/blob/master/GameData/AutoLoadGame/AutoLoadGame.version";
