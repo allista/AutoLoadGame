@@ -67,6 +67,7 @@
       <ProjectReference Include="..\AT_Utils\AT_Utils.csproj">
         <Project>{64cc36a2-0610-4f74-9f31-3d4e22866b7e}</Project>
         <Name>AT_Utils</Name>
+        <Private>False</Private>
       </ProjectReference>
     </ItemGroup>
 </Project>
