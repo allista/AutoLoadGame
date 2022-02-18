@@ -25,7 +25,7 @@ using AT_Utils;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion("1.0.10")]
+[assembly: AssemblyVersion("1.0.10.1")]
 [assembly: KSPAssembly("AutoLoadGame", 1, 0)]
 
 // The following attributes are used to specify the signing key for the assembly,
@@ -40,8 +40,8 @@ namespace AutoLoadGame
     {
         public ModInfo()
         {
-            MinKSPVersion = new Version(1, 8, 0);
-            MaxKSPVersion = new Version(1, 9, 1);
+            MinKSPVersion = new Version(1, 11, 1);
+            MaxKSPVersion = new Version(1, 11, 1);
 
             VersionURL =
                 "https://github.com/allista/AutoLoadGame/blob/master/GameData/AutoLoadGame/AutoLoadGame.version";
