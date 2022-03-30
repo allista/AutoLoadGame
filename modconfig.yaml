@@ -2,3 +2,13 @@ dll_path: GameData/AutoLoadGame/AutoLoadGame.dll
 archive_path: Releases
 github_url: allista/AutoLoadGame
 spacedock_mod_id: 832
+game_data_path: GameData
+additional_data_paths:
+    - 'saves'
+exclude_patterns:
+    - '*/config.xml'
+    - '*.user'
+    - '*.orig'
+    - '*.mdb'
+    - '*.pdb'
+    - '*.tmp'
