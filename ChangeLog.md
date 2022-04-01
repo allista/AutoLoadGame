@@ -1,5 +1,10 @@
 # Auto Load Game Change Log
 
+## v1.0.10.2 / 2022-04-01
+
+* Compiled for KSP 1.12.3
+* Internal project changes for CI/CD
+
 ## v1.0.10.1 / 2022-02-14
 
 * Do not copy AT_Utils dlls to output
